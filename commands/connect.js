@@ -1,4 +1,5 @@
 const { createSession } = require('../utils/walletConnect');
+const { setWallet } = require('../utils/walletStore');
 
 // Temporary in-memory storage (you can switch to Firebase or Supabase later)
 const walletMap = {};
@@ -15,6 +16,8 @@ module.exports = async (ctx) => {
 
     // Wait for them to approve in their wallet
     const session = await approval();
+    const address = session.namespaces.eip155.accounts[0].split(':')[2];
+    setWallet(userId, address);
 
     const userId = ctx.from.id;
     const address = session.namespaces.eip155.accounts[0].split(':')[2];
