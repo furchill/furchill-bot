@@ -1,11 +1,9 @@
 const getSwapQuote = require('../utils/getSwapQuote');
-
-// You may already have walletMap elsewhere — replace with your actual storage
-const walletMap = {};
+const { getWallet } = require('../utils/walletStore');
 
 module.exports = async (ctx) => {
   const userId = ctx.from.id;
-  const userWallet = walletMap[userId];
+  const userWallet = getWallet(userId); // ✅ Use the shared function
 
   if (!userWallet) {
     return ctx.reply(`⚠️ You need to /connect your wallet first.`);
@@ -19,7 +17,7 @@ module.exports = async (ctx) => {
   }
 
   const fromToken = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // ETH
-  const toToken = 'YOUR_FURCHILL_TOKEN_ADDRESS_HERE'; // replace me
+  const toToken = 'YOUR_FURCHILL_TOKEN_ADDRESS_HERE'; // Replace this!
   const amountInWei = (amountEth * 1e18).toFixed(0);
 
   const quote = await getSwapQuote(fromToken, toToken, amountInWei, userWallet);
