@@ -5,7 +5,7 @@ let client;
 async function initClient() {
   if (!client) {
     client = await SignClient.init({
-      projectId: 'b2beb3c13cc21dfd6aca3182b5812d65', // Your project ID 🔥
+      projectId: 'b2beb3c13cc21dfd6aca3182b5812d65',
       metadata: {
         name: "FurchillBot",
         description: "Telegram bot for $FURCHILL wallet connection",
