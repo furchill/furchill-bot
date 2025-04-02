@@ -7,7 +7,10 @@ const startCommand = require('./commands/start');
 const priceCommand = require('./commands/price');
 const swapCommand = require('./commands/swap');
 const connectCommand = require('./commands/connect');
+const swapCommand = require('./commands/swap');
 
+
+bot.command('swap', swapCommand);
 bot.command('connect', connectCommand);
 
 bot.start(startCommand);
