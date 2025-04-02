@@ -4,12 +4,10 @@ module.exports = async (ctx) => {
   try {
     const { uri } = await createSession();
 
-    // Deep link for mobile users
-    const mobileLink = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
+    const encoded = encodeURIComponent(uri);
+    const mobileLink = `https://metamask.app.link/wc?uri=${encoded}`;
 
-    await ctx.reply(`🔗 Connect your wallet:\n\n🧠 Mobile: [Open Wallet](${mobileLink})\n\n💻 Desktop: Scan this QR:\n\n${uri}`, {
-      parse_mode: 'Markdown'
-    });
+    await ctx.replyWithMarkdown(`🔗 *Connect your wallet*\n\n🧠 *Mobile users:* [Click to connect](${mobileLink})\n\n💻 *Desktop users:* Copy this URI into your wallet:\n\`${uri}\``);
   } catch (err) {
     console.error('Connect error:', err);
     ctx.reply('⚠️ Failed to start wallet session');
