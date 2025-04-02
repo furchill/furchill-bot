@@ -1,4 +1,4 @@
-const walletMap = {}; // This should match where you're storing wallets
+const walletMap = {}; // Replace this if you're storing wallets elsewhere
 
 module.exports = async (ctx) => {
   const userId = ctx.from.id;
@@ -8,14 +8,19 @@ module.exports = async (ctx) => {
     return ctx.reply(`⚠️ You need to /connect your wallet first.`);
   }
 
-  // For now, we’ll use hardcoded tokens to keep it simple
-  const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // ETH
-  const FURCHILL_ADDRESS = 'YOUR_FURCHILL_TOKEN_ADDRESS_HERE'; // Replace this
+  const messageParts = ctx.message.text.split(' ');
+  const amountEth = parseFloat(messageParts[1]);
 
-  const amountEth = 0.01; // hardcoded for now (in ETH)
+  if (!amountEth || isNaN(amountEth) || amountEth <= 0) {
+    return ctx.reply(`❌ Please provide a valid amount of ETH.\nExample: /swap 0.05`);
+  }
 
-  // 1inch swap link format
-  const swapUrl = `https://app.1inch.io/#/1/swap/${ETH_ADDRESS}/${FURCHILL_ADDRESS}?amount=${amountEth}&fromAddress=${userWallet}&slippage=1`;
+  const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // ETH (native)
+  const FURCHILL_ADDRESS = 'YOUR_FURCHILL_TOKEN_ADDRESS_HERE'; // Replace with actual ERC-20 token address
 
-  await ctx.reply(`🔁 Swap Link Ready!\nClick below to approve and sign the transaction:\n\n${swapUrl}`);
+  const amountInWei = (amountEth * 1e18).toFixed(0); // Convert ETH to wei
+
+  const swapUrl = `https://app.1inch.io/#/1/swap/${ETH_ADDRESS}/${FURCHILL_ADDRESS}?amount=${amountInWei}&fromAddress=${userWallet}&slippage=1`;
+
+  await ctx.reply(`🔁 Here's your swap link:\n\n${swapUrl}`);
 };
