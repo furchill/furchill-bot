@@ -1,4 +1,7 @@
-const walletMap = {}; // Replace this if you're storing wallets elsewhere
+const getSwapQuote = require('../utils/getSwapQuote');
+
+// You may already have walletMap elsewhere — replace with your actual storage
+const walletMap = {};
 
 module.exports = async (ctx) => {
   const userId = ctx.from.id;
@@ -12,15 +15,27 @@ module.exports = async (ctx) => {
   const amountEth = parseFloat(messageParts[1]);
 
   if (!amountEth || isNaN(amountEth) || amountEth <= 0) {
-    return ctx.reply(`❌ Please provide a valid amount of ETH.\nExample: /swap 0.05`);
+    return ctx.reply(`❌ Please enter a valid ETH amount.\nExample: /swap 0.03`);
   }
 
-  const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // ETH (native)
-  const FURCHILL_ADDRESS = 'YOUR_FURCHILL_TOKEN_ADDRESS_HERE'; // Replace with actual ERC-20 token address
+  const fromToken = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // ETH
+  const toToken = 'YOUR_FURCHILL_TOKEN_ADDRESS_HERE'; // replace me
+  const amountInWei = (amountEth * 1e18).toFixed(0);
 
-  const amountInWei = (amountEth * 1e18).toFixed(0); // Convert ETH to wei
+  const quote = await getSwapQuote(fromToken, toToken, amountInWei, userWallet);
 
-  const swapUrl = `https://app.1inch.io/#/1/swap/${ETH_ADDRESS}/${FURCHILL_ADDRESS}?amount=${amountInWei}&fromAddress=${userWallet}&slippage=1`;
+  if (!quote) {
+    return ctx.reply(`🚫 Could not fetch swap quote from 1inch. Try again later.`);
+  }
 
-  await ctx.reply(`🔁 Here's your swap link:\n\n${swapUrl}`);
+  const outToken = quote.toToken.symbol;
+  const outAmount = (quote.toTokenAmount / 10 ** quote.toToken.decimals).toFixed(2);
+  const swapUrl = `https://app.1inch.io/#/1/swap/${fromToken}/${toToken}?amount=${amountInWei}&fromAddress=${userWallet}&slippage=1`;
+
+  await ctx.replyWithMarkdown(
+    `💸 *Estimated Output:* ${outAmount} ${outToken}\n\n` +
+    `🔁 [Click to swap via 1inch](${swapUrl})\n\n` +
+    `*From:* ${amountEth} ETH\n*To:* $FURCHILL\n\n` +
+    `⚠️ Slippage: 1%`
+  );
 };
