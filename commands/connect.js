@@ -1,9 +1,6 @@
 const { createSession } = require('../utils/walletConnect');
 const { setWallet } = require('../utils/walletStore');
 
-// Temporary in-memory storage (you can switch to Firebase or Supabase later)
-const walletMap = {};
-
 module.exports = async (ctx) => {
   try {
     const { uri, approval } = await createSession();
@@ -11,21 +8,18 @@ module.exports = async (ctx) => {
     const encoded = encodeURIComponent(uri);
     const mobileLink = `https://metamask.app.link/wc?uri=${encoded}`;
 
-    // Let the user connect first
-    await ctx.replyWithMarkdown(`🔗 *Connect your wallet*\n\n🧠 *Mobile:* [Click here](${mobileLink})\n💻 *Desktop:* Scan in your wallet:\n\`${uri}\`\n\nI’ll be waiting... 👀`);
+    await ctx.replyWithMarkdown(
+      `🔗 *Connect your wallet*\n\n🧠 [Mobile: Connect here](${mobileLink})\n💻 Or paste into your wallet:\n\`${uri}\`\n\nI'll wait... 🐾`
+    );
 
-    // Wait for them to approve in their wallet
+    // Wait for wallet approval
     const session = await approval();
-    const address = session.namespaces.eip155.accounts[0].split(':')[2];
-    setWallet(userId, address);
-
     const userId = ctx.from.id;
-    const address = session.namespaces.eip155.accounts[0].split(':')[2];
 
-    // Save address in memory
-    walletMap[userId] = address;
+    const walletAddress = session.namespaces.eip155.accounts[0].split(':')[2]; // ✅ renamed from 'address'
+    setWallet(userId, walletAddress);
 
-    await ctx.reply(`✅ Wallet connected!\nAddress: ${address}`);
+    await ctx.reply(`✅ Wallet connected!\nAddress: ${walletAddress}`);
   } catch (err) {
     console.error('Connect error:', err);
     ctx.reply('⚠️ Failed to connect wallet.');
