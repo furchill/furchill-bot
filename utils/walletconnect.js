@@ -5,11 +5,11 @@ let client;
 async function initClient() {
   if (!client) {
     client = await SignClient.init({
-      projectId: 'REPLACE_WITH_YOUR_PROJECT_ID', // From WalletConnect cloud dashboard
+      projectId: 'b2beb3c13cc21dfd6aca3182b5812d65', // Your project ID 🔥
       metadata: {
         name: "FurchillBot",
-        description: "Telegram bot for $FURCHILL wallet connect",
-        url: "https://furchill.com", // Your site
+        description: "Telegram bot for $FURCHILL wallet connection",
+        url: "https://furchill.com",
         icons: ["https://furchill.com/icon.png"]
       }
     });
